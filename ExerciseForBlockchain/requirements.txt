@@ -1,2 +1,14 @@
+# gRPC - not working yet
 cmake>=3.13
-nasm>=?
+#build-essential
+#autoconf
+#libtool
+#pkg-config
+#gRPC
+#nasm
+# ODB
+#mysql-connector-c==6.1.11
+libmysqlclient==6.1.11
+odb==2.4.0
+libodb==2.4.0
+libodb-mysql==2.4.0
