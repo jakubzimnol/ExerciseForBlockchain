@@ -1,0 +1,6 @@
+*.o
+*.pb.cc
+*.pb.h
+cmake
+cocoapods
+cmake_externalproject

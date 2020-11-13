@@ -19,17 +19,16 @@ option java_multiple_files = true;
 option java_package = "io.grpc.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
 option objc_class_prefix = "HLW";
-
-package helloworld;
 */
+package usersProto;
+
 // The greeting service definition.
 service DatabaseService {
   rpc getUserById (Id) returns (User) {}
-  rpc registerNewUser (User) returns (Result) {}
-  rpc enumerateUsers (Pagination) returns(User) {}
+  rpc registerNewUser (User) returns (RegistrationResult) {}
+  rpc enumerateUsers (Pagination) returns(stream User) {}
 }
 
-// The request message containing the user's name.
 message User {
   int64 id = 1;
   string email = 2;
@@ -39,15 +38,14 @@ message User {
 }
 
 message Id {
-	id = 1;
+  int32 id = 1;
 }
 
-// The response message containing the greetings
-message Result {
+message RegistrationResult {
   bool message = 1;
 }
 
 message Pagination {
-	int pageSize = 1;
-	int pageNumber =2;
+  int32 pageSize = 1;
+  int32 pageNumber =2;
 }
