@@ -42,7 +42,7 @@ message Id {
 }
 
 message RegistrationResult {
-  bool message = 1;
+  int64 resultId = 1;
 }
 
 message Pagination {

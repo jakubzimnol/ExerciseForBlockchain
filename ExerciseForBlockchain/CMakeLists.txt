@@ -149,22 +149,21 @@ target_sources(server PUBLIC
 )
 
 if(MSVC)
-
-     set(DIRECTORIES 
+    set(DIRECTORIES 
 	    "${ODB_DIR}"
 	    "${ODB_MYSQL_DIR}"
 	    "${ODB_MYSQLCONNECTOR_DIR}"
-	)
-	target_include_directories(server PRIVATE
+       )
+    target_include_directories(server PRIVATE
 	    ${DIRECTORIES}
 	)
-	target_link_libraries(server 
+    target_link_libraries(server 
 	    "${ODB_DIR}/lib64/odb.lib"
 	    "${ODB_MYSQL_DIR}/lib64/odb-mysql.lib"
 	)
 else()
-target_link_libraries(server 
-	    "libodb-2.4"
-	    "libodb-mysql-2.4"
+    target_link_libraries(server
+	   odb-2.4
+	   odb-mysql-2.4
 	)
 endif()

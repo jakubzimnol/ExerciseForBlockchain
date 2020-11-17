@@ -12,16 +12,19 @@ std::string DatabaseOperator::initilizeConnection(int argc, char* argv[])
     }
     return "";
 }
-void DatabaseOperator::registerNewUser(Users user)
+unsigned long int DatabaseOperator::registerNewUser(Users user)
 {
     transaction t(db->begin());
     unsigned long int userid = db->persist(user);
     t.commit();
+    return userid;
 }
 
 std::unique_ptr<std::list<Users>> DatabaseOperator::enumerateUsers(unsigned int pageSize, unsigned int pageNumber)
 {
-    unsigned long int offset = pageNumber * pageSize;
+	//if (pageSize < 1)
+	 //std::throw "Error: page size lower than 1";
+    unsigned long int offset = (pageNumber-1) * pageSize;
     transaction t(db->begin());
     
     // Note that for most databases to return consistent result the

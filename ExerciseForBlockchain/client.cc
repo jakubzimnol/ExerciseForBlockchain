@@ -1,21 +1,3 @@
-/*
- *
- * Copyright 2015 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
 #include <iostream>
 #include <memory>
 #include <string>
@@ -41,7 +23,7 @@ class DatabaseClient {
 
   // Assembles the client's payload, sends it and presents the response back
   // from the server.
-   std::string getUserById(unsigned long int usersId) {
+   std::string getUserById(unsigned long int usersId, std::string& statusMsg) {
     // Data we are sending to the server.
    Id request;
     request.set_id(usersId);
@@ -57,18 +39,17 @@ class DatabaseClient {
     Status status = stub_->getUserById(&context, request, &reply);
 
     // Act upon its status.
-    if (status.ok()) {
+    if (status.ok())
       return toString(reply);
-    } else {
-      std::cout << status.error_code() << ": " << status.error_message()
-                << std::endl;
-      return "RPC failed";
+    else {
+        std::stringstream sstr;
+        sstr << "RPC failed with status code: " << status.error_code() << " and message: " << status.error_message() <<std::endl;
+        statusMsg = sstr.str();
+        return "";
     }
-
   }
 
-    std::string registerNewUser(const std::string& nickname, const std::string& email, const std::string& password, const bool& isActive ) {
-      // Follows the same pattern as SayHello.
+    bool registerNewUser(const std::string& nickname, const std::string& email, const std::string& password, const bool& isActive, unsigned long int& resultId, std::string& statusMsg) {
       User request;
       request.set_email(email);
       request.set_nickname(nickname);
@@ -77,23 +58,27 @@ class DatabaseClient {
       RegistrationResult reply;
       ClientContext context;
 
-      // Here we can use the stub's newly available method we just added.
       Status status = stub_->registerNewUser(&context, request, &reply);
       if (status.ok()) {
-          if (reply.message())
-              return "User was added successfully";
+      	resultId = reply.resultid();
+          if (resultId)
+              return true;
           else
-            return "Adding user failed";
-      } 
-      else 
+          {
+				statusMsg = "Adding user failed";
+				return false;
+          }
+      }
+      else
       {
-        std::cout << status.error_code() << ": " << status.error_message()
-                  << std::endl;
-        return "RPC failed";
+        std::stringstream sstr;
+        sstr << "RPC failed with status code: " << status.error_code() << " and message: " << status.error_message() <<std::endl;
+		  statusMsg = sstr.str();
+        return false;
       }
     }
 
-    std::unique_ptr<std::list<std::string>> enumerateUsers(unsigned int pageSize, unsigned int pageNumber) {
+    std::unique_ptr<std::list<std::string>> enumerateUsers(unsigned int pageSize, unsigned int pageNumber, std::string& statusMsg ) {
         Pagination request;
         request.set_pagenumber(pageNumber);
         request.set_pagesize(pageSize);
@@ -106,7 +91,10 @@ class DatabaseClient {
         }
         Status status = reader->Finish();
         if (!status.ok()) {
-            std::cout << status.error_code() << ": " << status.error_message() << std::endl;
+        	  std::stringstream sstr;
+           sstr << "RPC failed with status code: " << status.error_code() << " and message: " << status.error_message() <<std::endl;
+		     statusMsg = sstr.str();
+           return returnedStingList;
         }
         return returnedStingList;
     }
@@ -152,21 +140,41 @@ int main(int argc, char** argv) {
   } else {
     target_str = "localhost:50051";
   }
+  
   DatabaseClient databaseClient(grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
-  std::string user("world");
-  std::string reply = databaseClient.registerNewUser("John@mail.com", "John Doe", "John1234", true);
-  std::cout << "DatabaseClient results: " << reply << std::endl;
+  
+  //registering new user
+  ///////////////////////  
+  unsigned long int id;
+  std::string statusMsg ="";
+  if(databaseClient.registerNewUser("John@mail.com", "John Doe", "John1234", true, id, statusMsg))
+    std::cout << "Registered new user with id: "<< id << std::endl;
+  else
+    std::cout << statusMsg << std::endl;
+  
+  // getting user by id
+  /////////////////////
+  statusMsg = "";
+  std::string replyUser = databaseClient.getUserById(1, statusMsg);
+   if(statusMsg.empty())
+  		std::cout << "Received user: " << replyUser << std::endl;
+  	else
+  		std::cout << statusMsg << std::endl;
 
-  reply = databaseClient.getUserById(1);
-  std::cout << "DatabaseServer received: " << reply << std::endl;
-
+  //enumerate users by pagination
+  ///////////////////////////////
+  statusMsg = "";
   int pageSize=5, pageNumber=2;
-  std::unique_ptr<std::list<std::string>> usersList = databaseClient.enumerateUsers(pageSize, pageNumber);
-  std::cout << "DatabaseServer received users from page "<< pageNumber << std::endl;
-  std::for_each(usersList->begin(), usersList->end(), [](std::string& user)
+  std::unique_ptr<std::list<std::string>> usersList = databaseClient.enumerateUsers(pageSize, pageNumber, statusMsg);
+  if (statusMsg.empty())
+  {
+  	 std::cout << "DatabaseServer received users from page "<< pageNumber << std::endl;
+  	 std::for_each(usersList->begin(), usersList->end(), [](std::string& user)
       {
           std::cout << user;
       });
-
+	}
+	else
+		std::cout << statusMsg << std::endl;
   return 0;
 }
