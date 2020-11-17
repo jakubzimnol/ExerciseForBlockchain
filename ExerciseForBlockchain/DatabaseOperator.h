@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-#include <iostream>
 
 #include <odb/database.hxx>
 #include <odb/transaction.hxx>
@@ -11,8 +9,6 @@
 #include "Users-odb.hxx"
 
 using namespace std;
-using namespace odb::core;
-
 using namespace odb::core;
 
 class DatabaseOperator
@@ -28,7 +24,7 @@ public:
     // returns id off newly created user
     unsigned long int registerNewUser(Users user);
     
-    // returns users regarding pagination data (pageNumber must be higher than 0)
+    // returns unique_ptr to list of users regarding pagination data (pageNumber must be higher than 0)
     std::unique_ptr<std::list<Users>> enumerateUsers(unsigned int pageSize, unsigned int pageNumber);
     
     // returns user by id

@@ -23,7 +23,7 @@ unsigned long int DatabaseOperator::registerNewUser(Users user)
 std::unique_ptr<std::list<Users>> DatabaseOperator::enumerateUsers(unsigned int pageSize, unsigned int pageNumber)
 {
 	//if (pageSize < 1)
-	 //std::throw "Error: page size lower than 1";
+	 // to do
     unsigned long int offset = (pageNumber-1) * pageSize;
     transaction t(db->begin());
     
