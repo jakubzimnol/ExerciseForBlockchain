@@ -1,14 +1,19 @@
-# gRPC - not working yet
 cmake>=3.13
-#build-essential
-#autoconf
-#libtool
-#pkg-config
-#gRPC
-#nasm
+git
+# gRPC dependencies
+build-essential
+autoconf
+libtool
+pkg-config>=0.29.2
+# gRPC >= 1.33 you need to clone repo, build and install (described in README.txt)
+
+# mysql-connector-c for windows use 6.1.11 version
+libmysqlclient-dev>=8.0.22
+
 # ODB
-#mysql-connector-c==6.1.11
-libmysqlclient==6.1.11
 odb==2.4.0
-libodb==2.4.0
-libodb-mysql==2.4.0
+libodb-2.4
+libodb-mysql-2.4
+
+# Windows only
+#nasm

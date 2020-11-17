@@ -1,28 +1,9 @@
-# Copyright 2018 gRPC authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# cmake build file for C++ helloworld example.
-# Assumes protobuf and gRPC have been installed using cmake.
-# See cmake_externalproject/CMakeLists.txt for all-in-one cmake build
-# that automatically builds all the dependencies before building helloworld.
-
 cmake_minimum_required(VERSION 3.5.1)
 
 project(ExerciseForBlockchain C CXX)
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 else()
   add_definitions(-D_WIN32_WINNT=0x600)
 endif()
@@ -166,20 +147,24 @@ target_sources(server PUBLIC
 	DatabaseOperator.cpp
 	DatabaseOperator.h
 )
-set(ODB_DIR "C:/Users/User/Documents/ODB/libodb-2.4.0")
-set(ODB_MYSQL_DIR "C:/Users/User/Documents/ODB/libodb-mysql-2.4.0")
-set(ODB_MYSQLCONNECTOR_DIR "C:/Program Files/MySQL/MySQL Connector C 6.1/include")
 
-set(DIRECTORIES 
-    "${ODB_DIR}"
-    "${ODB_MYSQL_DIR}"
-    "${ODB_MYSQLCONNECTOR_DIR}"
-)
-target_include_directories(server PRIVATE
-    ${DIRECTORIES}
-)
+if(MSVC)
+
+     set(DIRECTORIES 
+	    "${ODB_DIR}"
+	    "${ODB_MYSQL_DIR}"
+	    "${ODB_MYSQLCONNECTOR_DIR}"
+	)
+	target_include_directories(server PRIVATE
+	    ${DIRECTORIES}
+	)
+	target_link_libraries(server 
+	    "${ODB_DIR}/lib64/odb.lib"
+	    "${ODB_MYSQL_DIR}/lib64/odb-mysql.lib"
+	)
+else()
 target_link_libraries(server 
-    "${ODB_DIR}/lib64/odb.lib"
-    "${ODB_MYSQL_DIR}/lib64/odb-mysql.lib"
-)
- 
+	    "libodb-2.4"
+	    "libodb-mysql-2.4"
+	)
+endif()

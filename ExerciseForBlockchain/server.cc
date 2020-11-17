@@ -53,7 +53,7 @@ void transformToProtoUser(Users& odbUser, User* protobufUser)
 class DatabaseServiceImpl final : public DatabaseService::Service {
 
     public:
-        DatabaseServiceImpl::DatabaseServiceImpl(int argc, char* argv[])
+        DatabaseServiceImpl(int argc, char* argv[])
         {
             dbOp.initilizeConnection(argc, argv);
         }

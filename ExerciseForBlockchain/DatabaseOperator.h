@@ -20,7 +20,7 @@ class DatabaseOperator
     typedef odb::query<Users> query;
     typedef odb::result<Users> result;
 public:
-    std::string initilizeConnection(int argc, char* argv[]);//std::string user, std::string password, std::string host, std::string database, unsigned port = 3306
+    std::string initilizeConnection(int argc, char* argv[]);
     void registerNewUser(Users user);
     std::unique_ptr<std::list<Users>> enumerateUsers(unsigned int pageSize, unsigned int pageNumber);
     Users getUserById(unsigned long int id);
